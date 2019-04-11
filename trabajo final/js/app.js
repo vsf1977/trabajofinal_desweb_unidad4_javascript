@@ -10,27 +10,32 @@ var segundonumero = 0
 var resultadofinal = 0
 var resultadointermedio = 0
 var funciones = ["on","dividido", "por", "menos","mas","igual"];
+var operaciones = ["mas", "menos", "por","dividido"];
 var numeros = ["1", "2", "3", "4", "5","6","7","8","9","0","sign","punto","."];
 var pantalla = document.getElementById("display");
 
 
 
-function inicializar ()
+function inicializar_pantalla()
 {
     decimal = false;
     limite = 8;
     negativo = false;
     numero = 0;
     temp = "";
+    pantalla.innerHTML = "0";
+}
+
+function inicializar_calculos ()
+{
     operacionactual = "";
     ultimaoperacion = "";
     primernumero = 0;
     segundonumero = 0;
     resultadofinal = 0;
     resultadointermedio = 0;
-    pantalla.innerHTML = "0";
+    temp = "";
 }
-
 
 function escribir_en_pantalla(key)
 {
@@ -96,8 +101,66 @@ document.getElementsByClassName("teclado")[0].onclick = function()
     {
         if (tecla == "on")
         {
-            inicializar();
-        }       
+            inicializar_calculos();
+            inicializar_pantalla();
+        }
+
+        if (operaciones.indexOf(tecla) >= 0)
+        {
+            if (ultimaoperacion == "")
+            {
+                ultimaoperacion = tecla;
+                primernumero =  pantalla.innerHTML;
+                resultadointermedio = primernumero;
+                inicializar_pantalla();                
+            }            
+            else
+            {              
+                segundonumero = pantalla.innerHTML;
+                switch (ultimaoperacion)
+                {
+                    case "mas":
+                        resultadointermedio = Number(primernumero) + Number(segundonumero);
+                        break;
+                    case "menos":
+                        resultadointermedio = Number(primernumero) - Number(segundonumero);
+                        break;
+                    case "por":
+                        resultadointermedio = Number(primernumero) * Number(segundonumero);
+                        break;
+                    case "dividido":
+                        resultadointermedio = Number(primernumero) + Number(segundonumero);
+                        break;
+                }
+                primernumero = segundonumero;                
+                ultimaoperacion = tecla;
+                operacionactual = tecla;
+                inicializar_pantalla();
+            }
+        } 
+
+        if (tecla == "igual")
+        {
+            segundonumero =  pantalla.innerHTML;
+            switch (ultimaoperacion)
+            {
+                case "mas":
+                    resultadointermedio = Number(primernumero) + Number(segundonumero);
+                    break;
+                case "menos":
+                    resultadointermedio = Number(primernumero) - Number(segundonumero);
+                    break;
+                case "por":
+                    resultadointermedio = Number(primernumero) * Number(segundonumero);
+                    break;
+                case "dividido":
+                    resultadointermedio = Number(primernumero) + Number(segundonumero);
+                    break;
+            }
+            primernumero = segundonumero;                
+            operacionactual = "igual";
+            pantalla.innerHTML = resultadointermedio;
+        }    
     }
 }
 
