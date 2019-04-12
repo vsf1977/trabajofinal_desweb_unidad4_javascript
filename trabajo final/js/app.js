@@ -1,185 +1,273 @@
-var decimal = false;
-var limite = 8;
-var negativo = false;
-var numero = 0;
-var temp = "";
-var operacionactual = "";
-var ultimaoperacion = "";
-var primernumero = 0
-var segundonumero = 0
-var resultadofinal = 0
-var resultadointermedio = 0
-var funciones = ["on","dividido", "por", "menos","mas","igual"];
-var operaciones = ["mas", "menos", "por","dividido"];
-var numeros = ["1", "2", "3", "4", "5","6","7","8","9","0","sign","punto","."];
-var pantalla = document.getElementById("display");
-
-
-
-function inicializar_pantalla()
+var Calculadora = 
 {
-    decimal = false;
-    limite = 8;
-    negativo = false;
-    numero = 0;
-    temp = "";
-    pantalla.innerHTML = "0";
-}
+    decimal : false,
+    limite : 8, decimal : false,
+    limite : 8,
+    negativo : false,
+    numero : 0,
+    cont : 0,
+    i : 0,
+    sw : false,
+    temp : "",
+    operacionactual : "",
+    ultimaoperacion : "",
+    primernumero : 0,
+    segundonumero : 0,
+    resultadofinal : 0,
+    resultadointermedio : 0,
+    funciones : ["on","dividido", "por", "menos","mas","igual"],
+    calculos : ["mas", "menos", "por","dividido"],
+    numeros : ["1", "2", "3", "4", "5","6","7","8","9","0","sign","punto","."],    
+    tecla : document.getElementsByClassName("teclado")[0],
+    pantalla : document.getElementById('display'),
 
-function inicializar_calculos ()
-{
-    operacionactual = "";
-    ultimaoperacion = "";
-    primernumero = 0;
-    segundonumero = 0;
-    resultadofinal = 0;
-    resultadointermedio = 0;
-    temp = "";
-}
-
-function escribir_en_pantalla(key)
-{
-    if (key == "punto")
+    init: function() 
     {
-        if (!decimal)
+      this.eventos()
+    },
+
+    eventos: function() 
+    {
+      this.tecla.addEventListener('click', function()       
+      {
+
+        if (Calculadora.numeros.indexOf(event.target.id) >= 0)
         {
-            decimal = true;
-            limite++;
-            key=".";
+            Calculadora.escribir_en_pantalla(event.target.id)
         }
-        else
+        
+        if (Calculadora.funciones.indexOf(event.target.id) >= 0)
         {
-            key="";
+            Calculadora.operaciones(event.target.id)
         }
-    }
-    if (key == "sign")
-    {            
-        if (pantalla.innerHTML !== "0")
+
+      })
+
+      this.tecla.addEventListener('mousedown', function()       
+      {
+        Calculadora.efectohundir(event.target)     
+      })
+
+      this.tecla.addEventListener('mouseup', function()       
+      {
+        Calculadora.efectolevantar(event.target)     
+      })
+
+    },
+    
+    escribir_en_pantalla: function(key) 
+    {        
+        if (key == "punto")
         {
-            if (!negativo)
+            if (!this.decimal)
             {
-                negativo = true;                    
+                    this.decimal = true;
+                this.limite++;
+                key=".";
             }
             else
             {
-                negativo = false;                    
-            }               
+                key="";
+            }
         }
-        key="";
-    }        
-    if (numeros.indexOf(key) >= 0 && temp.length < 8)
-    {
-        if (pantalla.innerHTML == "0" && numeros.indexOf(key) <= 9)
+        if (key == "sign")
+        {            
+            if (this.pantalla.innerHTML !== "0")
+            {
+                if (!this.negativo)
+                {
+                    this.negativo = true;                    
+                }
+                else
+                {
+                    this.negativo = false;                    
+                }               
+            }
+            key="";
+        }        
+        if (this.numeros.indexOf(key) >= 0 && this.temp.length < 8)
         {
-            pantalla.innerHTML = key;
+            if (this.pantalla.innerHTML == "0" && this.numeros.indexOf(key) <= 9)
+            {
+                this.pantalla.innerHTML = key;
+            }
+            else
+            {
+                this.pantalla.innerHTML = this.pantalla.innerHTML + key
+            }
+        }
+        this.numero = this.pantalla.innerHTML;
+        if ((this.negativo && this.numero > 0) || (!this.negativo && this.numero < 0))
+        {
+            this.numero *= - 1
+        }
+        this.pantalla.innerHTML = this.numero
+        this.temp =  this.pantalla.innerHTML.replace("-","")        
+        this.temp =  this.temp.replace(".","")
+    },
+
+    inicializar_pantalla : function()
+    {
+        this.decimal = false
+        this.limite = 8
+        this.negativo = false
+        this.numero = 0
+        this.temp = ""
+        this.pantalla.innerHTML = "0"
+    },
+
+    inicializar_calculos : function()
+    {
+        this.operacionactual = ""
+        this.ultimaoperacion = ""
+        this.primernumero = 0
+        this.segundonumero = 0
+        this.resultadofinal = 0
+        this.resultadointermedio = 0
+        this.temp = ""
+        this.sw = false
+    },
+
+    verificar_longitud : function(cadena)
+    {
+        verif = ""      
+        verif =  cadena.toString().replace("-","")        
+        verif =  verif.toString().replace(".","")     
+        if (verif.length < 9) 
+        {
+            return true
         }
         else
         {
-            pantalla.innerHTML = pantalla.innerHTML + key;
+            return false
         }
-    }
-    numero = pantalla.innerHTML;
-    if ((negativo && numero > 0) || (!negativo && numero < 0))
-    {
-        numero = numero * (- 1);
-    }
-    pantalla.innerHTML = numero;   
-    temp =  pantalla.innerHTML.replace("-","");        
-    temp =  temp.replace(".","");        
-}
+    },
 
-
-
-document.getElementsByClassName("teclado")[0].onclick = function()
-{
-    var tecla = event.target.id;
-    if (numeros.indexOf(tecla) >= 0)
+    operaciones : function(key)
     {
-       escribir_en_pantalla(tecla);
-    }
-    if (funciones.indexOf(tecla) >= 0)
-    {
-        if (tecla == "on")
+        if (key == "on")
         {
-            inicializar_calculos();
-            inicializar_pantalla();
+            Calculadora.inicializar_calculos()
+            Calculadora.inicializar_pantalla()
         }
 
-        if (operaciones.indexOf(tecla) >= 0)
+        if (Calculadora.calculos.indexOf(key) >= 0)
         {
-            if (ultimaoperacion == "")
+            //sw=false;
+            if (this.ultimaoperacion == "")
             {
-                ultimaoperacion = tecla;
-                primernumero =  pantalla.innerHTML;
-                resultadointermedio = primernumero;
-                inicializar_pantalla();                
+                this.ultimaoperacion = key
+                this.primernumero =  this.pantalla.innerHTML
+                this.resultadointermedio = this.primernumero
+                Calculadora.inicializar_pantalla()                
             }            
             else
             {              
-                segundonumero = pantalla.innerHTML;
-                switch (ultimaoperacion)
+                if (this.segundonumero !== 0)
+                {
+                    this.primernumero = this.resultadointermedio
+                }
+                this.segundonumero = this.pantalla.innerHTML                
+                switch (this.ultimaoperacion)
                 {
                     case "mas":
-                        resultadointermedio = Number(primernumero) + Number(segundonumero);
-                        break;
+                        this.resultadointermedio = Number(this.primernumero) + Number(this.segundonumero);
+                        break
                     case "menos":
-                        resultadointermedio = Number(primernumero) - Number(segundonumero);
-                        break;
+                        this.resultadointermedio = Number(this.primernumero) - Number(this.segundonumero);
+                        break
                     case "por":
-                        resultadointermedio = Number(primernumero) * Number(segundonumero);
-                        break;
+                        this.resultadointermedio = Number(this.primernumero) * Number(this.segundonumero);
+                        break
                     case "dividido":
-                        resultadointermedio = Number(primernumero) + Number(segundonumero);
-                        break;
-                }
-                primernumero = segundonumero;                
-                ultimaoperacion = tecla;
-                operacionactual = tecla;
-                inicializar_pantalla();
+                        this.resultadointermedio = Number(this.primernumero) / Number(this.segundonumero);
+                        break            
+                }                            
+                this.ultimaoperacion = key
+                this.operacionactual = key
+                Calculadora.inicializar_pantalla()
             }
         } 
 
-        if (tecla == "igual")
+        if (key == "igual")        
         {
-            segundonumero =  pantalla.innerHTML;
-            switch (ultimaoperacion)
+            if (this.operacionactual == "")
+            {
+                if (this.segundonumero !== 0)
+                {
+                    this.primernumero = this.pantalla.innerHTML
+                }
+                else
+                {
+                    this.segundonumero = this.pantalla.innerHTML                
+                }
+            }
+            else
+            {
+                this.primernumero = this.resultadointermedio
+                this.segundonumero = this.pantalla.innerHTML                  
+            }
+            
+            switch (this.ultimaoperacion)
             {
                 case "mas":
-                    resultadointermedio = Number(primernumero) + Number(segundonumero);
-                    break;
+                    this.resultadofinal = Number(this.primernumero) + Number(this.segundonumero);
+                    break
                 case "menos":
-                    resultadointermedio = Number(primernumero) - Number(segundonumero);
-                    break;
+                    this.resultadofinal = Number(this.primernumero) - Number(this.segundonumero);
+                    break
                 case "por":
-                    resultadointermedio = Number(primernumero) * Number(segundonumero);
-                    break;
+                    this.resultadofinal = Number(this.primernumero) * Number(this.segundonumero);
+                    break
                 case "dividido":
-                    resultadointermedio = Number(primernumero) + Number(segundonumero);
-                    break;
+                    this.resultadofinal = Number(this.primernumero) / Number(this.segundonumero);
+                    break     
             }
-            primernumero = segundonumero;                
-            operacionactual = "igual";
-            pantalla.innerHTML = resultadointermedio;
-        }    
-    }
-}
+            if (Calculadora.verificar_longitud(this.resultadofinal))
+            {
+                this.pantalla.innerHTML = this.resultadofinal;
+                if (!this.sw)   
+                {
+                    this.resultadointermedio =  this.segundonumero;
+                    this.sw =  true
+                }
+            }
+            else                
+            {   
+                this.temp = ""
+                this.cont = 0
+                this.i = 0
+                while (this.cont < 8)
+                {
+                    if (this.resultadofinal.toString().substring(this.i,this.i+1) !== "-" && this.resultadofinal.toString().substring(this.i,this.i+1) !== ".")
+                    {
+                        this.cont++
+                    }
+                    this.temp = this.temp + this.resultadofinal.toString().substring(this.i,this.i+1)                  
+                    this.i++
+                }             
+                this.pantalla.innerHTML = this.temp
+                alert("El resultado sobrepasó los 8 caracteres")
+            }
+        } 
+    },
 
-
-document.getElementsByClassName("teclado")[0].onmousedown = function()
-{
-    var tecla = event.target;
-    if (tecla.id.length > 0 )
+    efectohundir : function(key)
     {
-        tecla.style.transform = "scale(0.9)";
-    }
-}
+        if (key.id.length > 0 )
+        {
+            key.style.transform = "scale(0.9)"
+        }        
+    },
 
-
-document.getElementsByClassName("teclado")[0].onmouseup = function()
-{
-    var tecla = event.target;
-    if (tecla.id.length > 0 )
+    
+    efectolevantar : function(key)
     {
-        tecla.style.transform = "scale(1)";
+        if (key.id.length > 0 )
+        {
+            key.style.transform = "scale(1)"
+        }
     }
+
 }
+Calculadora.init()
